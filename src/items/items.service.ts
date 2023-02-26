@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, LessThan, MoreThan, Repository } from 'typeorm';
 import { Item } from './item.entity';
-import { StatusEnum, TypeEnum } from '../common/types';
+import { StatusEnum, TypeEnum, TypeFilter } from '../common/types';
 
 @Injectable()
 export class ItemsService {
@@ -11,7 +11,19 @@ export class ItemsService {
     private readonly itemRepository: Repository<Item>,
   ) {}
 
-  async findAll(): Promise<Item[]> {
+  async findAll(type: TypeFilter): Promise<Item[]> {
+    if (type === TypeFilter.COMPLETED) {
+      return await this.itemRepository.find({
+        where: { endDate: LessThan(new Date()) },
+      });
+    }
+
+    if (type === TypeFilter.ONGOING) {
+      return await this.itemRepository.find({
+        where: [{ endDate: MoreThan(new Date()) }, { endDate: IsNull() }],
+      });
+    }
+
     return await this.itemRepository.find();
   }
 
@@ -33,13 +45,19 @@ export class ItemsService {
   }
 
   async publishItem(id: number): Promise<any> {
+    const item = await this.itemRepository.findOne({ where: { id } });
+    if (!item) {
+      throw new Error('Item not found');
+    }
+
     return await this.itemRepository.update(id, {
       type: TypeEnum.PUBLISH,
       startDate: new Date(),
+      endDate: new Date(Date.now() + item.duration),
     });
   }
 
-  async bid(id: number, item: Item): Promise<any> {
+  async bid(id: number, { amount }: { amount: number }): Promise<any> {
     const itemDB = await this.itemRepository.findOne({
       where: { id, status: StatusEnum.ACTIVE },
     });
@@ -48,16 +66,17 @@ export class ItemsService {
       throw new Error('Item is not public');
     }
 
-    if (new Date(+itemDB.startDate + itemDB.duration) < new Date()) {
+    console.log(itemDB.endDate, new Date());
+    if (itemDB.endDate < new Date()) {
       throw new Error('Item is expired');
     }
 
-    if (itemDB.currentPrice >= item.currentPrice) {
+    if (itemDB.currentPrice >= amount || amount < itemDB.startPrice) {
       throw new Error('Current price must be higher than current price');
     }
 
     return await this.itemRepository.update(id, {
-      currentPrice: item.currentPrice,
+      currentPrice: amount,
     });
   }
 }

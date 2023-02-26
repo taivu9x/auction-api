@@ -1,5 +1,6 @@
 import { Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { BidGuard } from 'src/auth/guard/bid.guard';
 import { ItemsService } from './items.service';
 
 @Controller('items')
@@ -8,13 +9,14 @@ export class ItemsController {
 
   @UseGuards(AuthGuard)
   @Get('')
-  async findAll() {
-    const result = await this.itemsService.findAll();
+  async findAll(@Req() req) {
+    const { type } = req.query;
+    const result = await this.itemsService.findAll(type);
     return result.map((item) => {
       return {
         ...item,
-        duration: item.startDate
-          ? +new Date(item.startDate) + item.duration - Date.now()
+        duration: item.endDate
+          ? Math.round((+new Date(item.endDate) - Date.now()) / 1000)
           : 0,
       };
     });
@@ -44,6 +46,7 @@ export class ItemsController {
     return await this.itemsService.publishItem(req.params.id);
   }
 
+  @UseGuards(BidGuard)
   @UseGuards(AuthGuard)
   @Patch(':id/bid')
   async bid(@Req() req) {

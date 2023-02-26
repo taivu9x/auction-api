@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Item } from './item.entity';
 import { ItemsController } from './items.controller';
 import { ItemsService } from './items.service';
+import { BidGuard } from 'src/auth/guard/bid.guard';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { ItemsService } from './items.service';
     }),
   ],
   controllers: [ItemsController],
-  providers: [ItemsService, AuthGuard],
+  providers: [ItemsService, AuthGuard, BidGuard],
 })
 export class ItemsModule {}

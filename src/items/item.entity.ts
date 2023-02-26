@@ -24,6 +24,9 @@ export class Item {
   @Column({ nullable: true })
   startDate: Date | null;
 
+  @Column({ nullable: true })
+  endDate: Date | null;
+
   @Column()
   duration: number;
 
