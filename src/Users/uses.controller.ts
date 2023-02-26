@@ -1,74 +1,36 @@
 import {
   Body,
   Controller,
-  Get,
   HttpException,
   HttpStatus,
-  Post,
+  Patch,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
 
-  @Get('me')
-  async getMe(@Req() req) {
-    return 'Hello world';
-  }
+  @UseGuards(AuthGuard)
+  @Patch('deposit')
+  async deposit(@Req() req, @Body() body) {
+    const { amount } = body;
+    const { user } = req;
 
-  @Post('register')
-  async register(@Body() createUserDto: RegisterDto) {
-    if (!createUserDto.email || !createUserDto.password) {
-      throw new HttpException(
-        'Email and password are required',
-        HttpStatus.BAD_REQUEST,
-      );
+    if (!amount) {
+      throw new HttpException('Amount is required', HttpStatus.BAD_REQUEST);
     }
 
-    const hashedPassword = await this.userService.hashPassword(
-      createUserDto.password,
-    );
-    const user = await this.userService.createUser({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-
-    const token = this.userService.generateToken(user);
+    const updatedUser = await this.userService.depositMoney(user.id, amount);
 
     return {
-      token,
       user: {
-        id: user.id,
-        email: user.email,
-      },
-    };
-  }
-
-  @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    const user = await this.userService.validateUser(
-      loginDto.email,
-      loginDto.password,
-    );
-
-    if (!user) {
-      throw new HttpException(
-        'Invalid email or password',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    const token = this.userService.generateToken(user);
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
+        id: updatedUser.id,
+        email: updatedUser.email,
+        amount: updatedUser.amount,
       },
     };
   }

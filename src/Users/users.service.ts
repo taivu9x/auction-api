@@ -1,52 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RegisterDto } from './dto/register.dto';
-import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private readonly jwtSecret = process.env.JWT_SECRET;
-
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
   ) {}
 
-  async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(password, salt);
-    return hashedPassword;
-  }
+  async depositMoney(id: number, amount: number) {
+    if (amount <= 0) {
+      throw new Error('Amount must be greater than 0');
+    }
 
-  generateToken(user: User): string {
-    const payload = { email: user.email, sub: user.id };
-    const token = jwt.sign(payload, this.jwtSecret, { expiresIn: '1h' });
-    return token;
-  }
-
-  async createUser({ email, password }: RegisterDto) {
-    const user = new User();
-    user.email = email;
-    user.password = password;
+    const user = await this.userRepository.findOne({ where: { id } });
+    user.amount += +amount;
     return this.userRepository.save(user);
   }
 
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.userRepository.findOne({ where: { email } });
-
-    if (!user) {
-      return null;
+  async drawMoney(id: number, amount: number) {
+    if (amount <= 0) {
+      throw new Error('Amount must be greater than 0');
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const user = await this.userRepository.findOne({ where: { id } });
 
-    if (!passwordMatch) {
-      return null;
+    if (user.amount < amount) {
+      throw new Error('Amount must be less than user amount');
     }
 
-    return user;
+    user.amount -= amount;
+    return this.userRepository.save(user);
+  }
+
+  async checkBalance(id: number) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    return user.amount;
   }
 }

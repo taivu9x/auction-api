@@ -10,7 +10,6 @@ config();
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log(__dirname + '/*/*.entity{.ts,.js}');
         return {
           type: 'postgres',
           host: configService.get('DB_HOST'),
@@ -18,6 +17,7 @@ config();
           username: configService.get('DB_USERNAME'),
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_DATABASE'),
+          timezone: 'UTC',
           entities: [__dirname + '/*/*.entity{.ts,.js}'],
           synchronize: true,
         };
