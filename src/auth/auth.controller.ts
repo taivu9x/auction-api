@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  Post,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -18,15 +10,10 @@ export class AuthController {
   @Post('register')
   async register(@Body() createUserDto: RegisterDto) {
     if (!createUserDto.email || !createUserDto.password) {
-      throw new HttpException(
-        'Email and password are required',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Email and password are required', HttpStatus.BAD_REQUEST);
     }
 
-    const hashedPassword = await this.authService.hashPassword(
-      createUserDto.password,
-    );
+    const hashedPassword = await this.authService.hashPassword(createUserDto.password);
     const user = await this.authService.createUser({
       ...createUserDto,
       password: hashedPassword,
@@ -45,16 +32,10 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
-    const user = await this.authService.validateUser(
-      loginDto.email,
-      loginDto.password,
-    );
+    const user = await this.authService.validateUser(loginDto.email, loginDto.password);
 
     if (!user) {
-      throw new HttpException(
-        'Invalid email or password',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException('Invalid email or password', HttpStatus.UNAUTHORIZED);
     }
 
     const token = this.authService.generateToken(user);

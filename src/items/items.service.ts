@@ -8,7 +8,7 @@ import { StatusEnum, TypeEnum, TypeFilter } from '../common/types';
 export class ItemsService {
   constructor(
     @InjectRepository(Item)
-    private readonly itemRepository: Repository<Item>,
+    private readonly itemRepository: Repository<Item>
   ) {}
 
   async findAll(type: TypeFilter): Promise<Item[]> {

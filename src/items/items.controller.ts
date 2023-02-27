@@ -12,12 +12,10 @@ export class ItemsController {
   async findAll(@Req() req) {
     const { type } = req.query;
     const result = await this.itemsService.findAll(type);
-    return result.map((item) => {
+    return result.map(item => {
       return {
         ...item,
-        duration: item.endDate
-          ? Math.round((+new Date(item.endDate) - Date.now()) / 1000)
-          : 0,
+        duration: item.endDate ? Math.round((+new Date(item.endDate) - Date.now()) / 1000) : 0,
       };
     });
   }
