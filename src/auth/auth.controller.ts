@@ -24,6 +24,8 @@ export class AuthController {
     return {
       token,
       user: {
+        firname: user.firstName,
+        lastname: user.lastName,
         id: user.id,
         email: user.email,
       },
