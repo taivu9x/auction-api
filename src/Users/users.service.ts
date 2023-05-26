@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -12,7 +12,7 @@ export class UsersService {
 
   async depositMoney(id: number, amount: number) {
     if (amount <= 0) {
-      throw new Error('Amount must be greater than 0');
+      throw new BadRequestException('Amount must be greater than 0');
     }
 
     const user = await this.userRepository.findOne({ where: { id } });
@@ -22,13 +22,13 @@ export class UsersService {
 
   async drawMoney(id: number, amount: number) {
     if (amount <= 0) {
-      throw new Error('Amount must be greater than 0');
+      throw new BadRequestException('Amount must be greater than 0');
     }
 
     const user = await this.userRepository.findOne({ where: { id } });
 
     if (user.amount < amount) {
-      throw new Error('Amount must be less than user amount');
+      throw new BadRequestException('Amount must be less than user amount');
     }
 
     user.amount -= amount;

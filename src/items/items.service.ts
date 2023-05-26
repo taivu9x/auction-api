@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, LessThan, MoreThan, Repository } from 'typeorm';
 import { Item } from './item.entity';
@@ -47,13 +47,13 @@ export class ItemsService {
   async publishItem(id: number): Promise<any> {
     const item = await this.itemRepository.findOne({ where: { id } });
     if (!item) {
-      throw new Error('Item not found');
+      throw new NotFoundException('Item not found');
     }
 
     return await this.itemRepository.update(id, {
       type: TypeEnum.PUBLISH,
       startDate: new Date(),
-      endDate: new Date(Date.now() + item.duration),
+      endDate: new Date(Date.now() + item.duration * 1000),
     });
   }
 
@@ -63,16 +63,15 @@ export class ItemsService {
     });
 
     if (!itemDB || itemDB.type !== TypeEnum.PUBLISH) {
-      throw new Error('Item is not public');
+      throw new InternalServerErrorException('Item is not public');
     }
 
-    console.log(itemDB.endDate, new Date());
     if (itemDB.endDate < new Date()) {
-      throw new Error('Item is expired');
+      throw new InternalServerErrorException('Item is expired');
     }
 
     if (itemDB.currentPrice >= amount || amount < itemDB.startPrice) {
-      throw new Error('Current price must be higher than current price');
+      throw new InternalServerErrorException('Current price must be higher than current price');
     }
 
     return await this.itemRepository.update(id, {

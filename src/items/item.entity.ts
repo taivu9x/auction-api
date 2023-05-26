@@ -1,4 +1,6 @@
+import { User } from 'src/Users/user.entity';
 import { StatusEnum, TypeEnum } from 'src/common/types';
+import { JoinColumn, ManyToOne } from 'typeorm';
 import {
   Column,
   CreateDateColumn,
@@ -41,4 +43,11 @@ export class Item {
 
   @Column({ default: TypeEnum.DRAFT })
   type: TypeEnum;
+
+  @Column({ nullable: true })
+  ownerId: number;
+
+  @ManyToOne(() => User, user => user.items)
+  @JoinColumn({ name: 'ownerId' })
+  owner: User;
 }

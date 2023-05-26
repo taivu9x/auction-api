@@ -1,4 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 
@@ -9,7 +15,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers['authorization'];
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return false;
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
     const token = authHeader.slice(7, authHeader.length);
     try {
@@ -17,7 +23,7 @@ export class AuthGuard implements CanActivate {
       request.user = decoded;
       return true;
     } catch (err) {
-      return false;
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
   }
 }
