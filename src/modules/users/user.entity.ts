@@ -1,5 +1,5 @@
 import { StatusEnum } from 'src/common/types';
-import { Item } from 'src/items/item.entity';
+import { Item } from 'src/modules/items/item.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

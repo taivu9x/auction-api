@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/Users/user.entity';
+import { User } from 'src/modules/users/user.entity';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { config } from 'dotenv';
@@ -11,14 +11,20 @@ config();
 
 @Module({
   imports: [
+    ConfigModule,
     TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },
-      }),
       inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => {
+        console.log(configService.get('auth'));
+        return {
+          secret: configService.get('auth.jwtSecret'),
+          signOptions: {
+            expiresIn: configService.get<string>('auth.jwtExpiryTime'),
+          },
+        };
+      },
     }),
   ],
   controllers: [AuthController],

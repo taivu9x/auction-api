@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, LessThan, MoreThan, Repository } from 'typeorm';
 import { Item } from './item.entity';
-import { StatusEnum, TypeEnum, TypeFilter } from '../common/types';
+import { StatusEnum, TypeEnum, TypeFilter } from '../../common/types';
 
 @Injectable()
 export class ItemsService {

@@ -1,6 +1,6 @@
 import { Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
-import { BidGuard } from 'src/auth/guard/bid.guard';
+import { AuthGuard } from 'src/modules/auth/guard/auth.guard';
+import { BidGuard } from 'src/modules/auth/guard/bid.guard';
 import { ItemsService } from './items.service';
 
 @Controller('items')
