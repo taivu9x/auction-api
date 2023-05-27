@@ -13,7 +13,7 @@ You need to make sure that you have postgres running locally. You can use Docker
 **docker**:
 
 ```bash
-docker container run -d -it -p 5432:5432 -e "POSTGRES_USER=postgres" -e "POSTGRES_HOST_AUTH_METHOD=trust" --name postgres postgres
+docker run -d  -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password123 -e POSTGRES_DB=auction -p 5432:5432 --name docker-postgres postgres
 ```
 
 **homebrew**:
@@ -38,6 +38,11 @@ DB_USERNAME=postgres
 DB_PASSWORD=password123
 DB_DATABASE=auction
 ```
+
+To generate file .env, you can run script
+`./scripts/generate-env.ts`
+or
+`npm run generate-env`
 
 ## Installation
 
