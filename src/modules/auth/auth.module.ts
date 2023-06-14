@@ -17,7 +17,6 @@ config();
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        console.log(configService.get('auth'));
         return {
           secret: configService.get('auth.jwtSecret'),
           signOptions: {
