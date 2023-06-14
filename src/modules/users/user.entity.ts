@@ -1,5 +1,4 @@
 import { StatusEnum } from 'src/common/types';
-import { Item } from 'src/modules/items/item.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -7,7 +6,6 @@ import {
   Unique,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -39,6 +37,4 @@ export class User {
 
   @Column({ default: StatusEnum.ACTIVE })
   status: StatusEnum;
-
-  @OneToMany(() => Item, item => item.owner) items: Item[];
 }

@@ -2,8 +2,10 @@ import { randomBytes } from 'crypto';
 import * as fs from 'fs/promises';
 
 const envMap = {
+  // app
   NODE_ENV: 'development',
   PORT: '4000',
+  // db
   DB_TYPE: 'postgres',
   DB_HOST: 'localhost',
   DB_PORT: '5432',
@@ -11,6 +13,7 @@ const envMap = {
   DB_PASSWORD: 'password123',
   DB_DATABASE: 'auction',
   POSTGRES_SSL_CERT: '',
+  // jwt
   JWT_EXPIRY_TIME: '30d',
 };
 
